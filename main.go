@@ -12,9 +12,13 @@ func main() {
 	defer resp.Body.Close()
 	html := new(bytes.Buffer)
 	html.ReadFrom(resp.Body)
-	fmt.Println(html.String())
+	//fmt.Println(html.String())
 	reg := regexp.MustCompile(`var url = '([\S]+)'`)
-	bb := reg.FindAllStringSubmatch(html.String(), -1)
-	fmt.Println(bb[0][1])
+	url_string := reg.FindAllStringSubmatch(html.String(), -1)
+	//fmt.Println(url_string[0][1])
+
+	replace := regexp.MustCompile(`\\\/`)
+	replace_string := replace.ReplaceAllString(url_string[0][1], `/`)
+	fmt.Println(replace_string)
 
 }
