@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"regexp"
 )
 
 func main() {
@@ -11,5 +12,9 @@ func main() {
 	defer resp.Body.Close()
 	html := new(bytes.Buffer)
 	html.ReadFrom(resp.Body)
-	fmt.Println(html)
+	fmt.Println(html.String())
+	reg := regexp.MustCompile(`var url = '([\S]+)'`)
+	bb := reg.FindAllStringSubmatch(html.String(), -1)
+	fmt.Println(bb[0][1])
+
 }
