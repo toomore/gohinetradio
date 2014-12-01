@@ -43,12 +43,10 @@ func GetList() {
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var output string
 	for no, data := range url_string {
+		output += fmt.Sprintf("%d. [%s] %s\t", no+1, data[2], data[1])
 		if (no+1)%3 == 0 {
-			output += fmt.Sprintf("%d. [%s] %s\t", no+1, data[2], data[1])
 			fmt.Fprintln(w, output)
 			output = ""
-		} else {
-			output += fmt.Sprintf("%d. [%s] %s\t", no+1, data[2], data[1])
 		}
 	}
 	fmt.Fprintln(w, output)
