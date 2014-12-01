@@ -29,11 +29,18 @@ func GetUrl(url_no string) (replace_string string) {
 	return
 }
 
+func PrintChannel() {
+	fmt.Println("[207] 中廣新聞網")
+	fmt.Println("[232] 飛碟電台")
+}
+
 func main() {
 	//fmt.Println("----- test open -----\r\n")
 	//exec.Command("open", "-a", "firefox").Run()
 
 	//fmt.Println(GetUrl("207"))
+
+	PrintChannel()
 
 	in := bufio.NewReader(os.Stdin)
 	std_string, _ := in.ReadString('\n')
