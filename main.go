@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 	"text/tabwriter"
@@ -66,15 +67,13 @@ func PrintChannel() {
 }
 
 func main() {
-	//fmt.Println("----- test open -----\r\n")
-	//exec.Command("open", "-a", "firefox").Run()
-
 	//fmt.Println(GetUrl("207"))
-
 	//PrintChannel()
 	GetList()
 
 	in := bufio.NewReader(os.Stdin)
 	std_string, _ := in.ReadString('\n')
-	fmt.Println(GetUrl(strings.Split(std_string, "\n")[0]))
+	radio_url := GetUrl(strings.Split(std_string, "\n")[0])
+	fmt.Println(radio_url)
+	exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radio_url).Start()
 }
