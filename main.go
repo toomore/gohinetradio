@@ -7,8 +7,11 @@ import (
 	"regexp"
 )
 
-func main() {
-	resp, _ := http.Get("http://hichannel.hinet.net/radio/mobile/index.do?id=232")
+func GetUrl(url_no string) (replace_string string) {
+	url := fmt.Sprintf("http://hichannel.hinet.net/radio/mobile/index.do?id=%s", url_no)
+	//resp, _ := http.Get("http://hichannel.hinet.net/radio/mobile/index.do?id=232")
+	//resp, _ := http.Get("http://hichannel.hinet.net/radio/mobile/index.do?id=207")
+	resp, _ := http.Get(url)
 	defer resp.Body.Close()
 	html := new(bytes.Buffer)
 	html.ReadFrom(resp.Body)
@@ -18,9 +21,18 @@ func main() {
 	//fmt.Println(url_string[0][1])
 
 	replace := regexp.MustCompile(`\\\/`)
-	replace_string := replace.ReplaceAllString(url_string[0][1], `/`)
-	fmt.Println(replace_string)
+	replace_string = replace.ReplaceAllString(url_string[0][1], `/`)
+	//fmt.Println(replace_string)
+	return
+}
 
+func main() {
 	//fmt.Println("----- test open -----\r\n")
 	//exec.Command("open", "-a", "firefox").Run()
+
+	fmt.Println(GetUrl("207"))
+
+	//in := bufio.NewReader(os.Stdin)
+	//line, _ := in.ReadString('\n')
+	//fmt.Println(line)
 }
