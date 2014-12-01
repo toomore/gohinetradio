@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
+	"strings"
 )
 
 func GetUrl(url_no string) (replace_string string) {
@@ -30,9 +33,9 @@ func main() {
 	//fmt.Println("----- test open -----\r\n")
 	//exec.Command("open", "-a", "firefox").Run()
 
-	fmt.Println(GetUrl("207"))
+	//fmt.Println(GetUrl("207"))
 
-	//in := bufio.NewReader(os.Stdin)
-	//line, _ := in.ReadString('\n')
-	//fmt.Println(line)
+	in := bufio.NewReader(os.Stdin)
+	std_string, _ := in.ReadString('\n')
+	fmt.Println(GetUrl(strings.Split(std_string, "\n")[0]))
 }
