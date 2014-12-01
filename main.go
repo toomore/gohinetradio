@@ -31,7 +31,14 @@ func GetUrl(url_no string) (replace_string string) {
 
 func PrintChannel() {
 	fmt.Println("[207] 中廣新聞網")
+	fmt.Println("[205] 中廣流行網 i like")
+	fmt.Println("[206] 中廣音樂網i radio")
 	fmt.Println("[232] 飛碟電台")
+	fmt.Println("[222] HitFm聯播網 Taipei 北部")
+	fmt.Println("[156] KISS RADIO 大眾廣播電台")
+	fmt.Println("[308] KISS RADIO 網路音樂台")
+	fmt.Println("[187] NEWS98新聞網")
+	fmt.Println("[370] POP Radio 台北流行廣播電台")
 }
 
 func main() {
