@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 	"text/tabwriter"
 )
 
@@ -49,6 +51,7 @@ func GetList() {
 			output += fmt.Sprintf("%d. [%s] %s\t", no+1, data[2], data[1])
 		}
 	}
+	fmt.Fprintln(w, output)
 	w.Flush()
 }
 
@@ -71,10 +74,9 @@ func main() {
 	//fmt.Println(GetUrl("207"))
 
 	//PrintChannel()
-
-	//in := bufio.NewReader(os.Stdin)
-	//std_string, _ := in.ReadString('\n')
-	//fmt.Println(GetUrl(strings.Split(std_string, "\n")[0]))
-
 	GetList()
+
+	in := bufio.NewReader(os.Stdin)
+	std_string, _ := in.ReadString('\n')
+	fmt.Println(GetUrl(strings.Split(std_string, "\n")[0]))
 }
