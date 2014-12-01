@@ -21,4 +21,6 @@ func main() {
 	replace_string := replace.ReplaceAllString(url_string[0][1], `/`)
 	fmt.Println(replace_string)
 
+	//fmt.Println("----- test open -----\r\n")
+	//exec.Command("open", "-a", "firefox").Run()
 }
