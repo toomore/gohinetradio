@@ -3,31 +3,34 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 	"text/tabwriter"
 )
 
-func GetUrl(url_no string) (replace_string string) {
-	url := fmt.Sprintf("http://hichannel.hinet.net/radio/mobile/index.do?id=%s", url_no)
-	//resp, _ := http.Get("http://hichannel.hinet.net/radio/mobile/index.do?id=232")
-	//resp, _ := http.Get("http://hichannel.hinet.net/radio/mobile/index.do?id=207")
+const (
+	PlayURL string = "http://hichannel.hinet.net/radio/play.do?id=%s"
+)
+
+type RadioData struct {
+	ChannelTitle   string
+	PlayRadio      string
+	ProgramName    string
+	ChannelCollect bool
+}
+
+func GetUrl(url_no string) (r RadioData) {
+	url := fmt.Sprintf(PlayURL, url_no)
 	resp, _ := http.Get(url)
 	defer resp.Body.Close()
-	html := new(bytes.Buffer)
-	html.ReadFrom(resp.Body)
-	//fmt.Println(html.String())
-	reg := regexp.MustCompile(`var url = '([\S]+)'`)
-	url_string := reg.FindAllStringSubmatch(html.String(), -1)
-	//fmt.Println(url_string[0][1])
-
-	replace := regexp.MustCompile(`\\\/`)
-	replace_string = replace.ReplaceAllString(url_string[0][1], `/`)
-	//fmt.Println(replace_string)
+	data, _ := ioutil.ReadAll(resp.Body)
+	jsonData := json.NewDecoder(bytes.NewReader(data))
+	jsonData.Decode(&r)
 	return
 }
 
@@ -69,11 +72,11 @@ func PrintChannel() {
 func main() {
 	//fmt.Println(GetUrl("207"))
 	//PrintChannel()
-	GetList()
+	//GetList()
 
 	in := bufio.NewReader(os.Stdin)
 	std_string, _ := in.ReadString('\n')
 	radio_url := GetUrl(strings.Split(std_string, "\n")[0])
 	fmt.Println(radio_url)
-	exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radio_url).Start()
+	//exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radio_url).Start()
 }
