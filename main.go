@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"text/tabwriter"
 )
@@ -102,8 +103,9 @@ func main() {
 	//fmt.Println(GetRadioList(LISTPAGE))
 
 	in := bufio.NewReader(os.Stdin)
-	std_string, _ := in.ReadString('\n')
-	radio_url := GetUrl(strings.Split(std_string, "\n")[0])
-	fmt.Println(radio_url)
-	//exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radio_url).Start()
+	stdString, _ := in.ReadString('\n')
+	radioData := GetUrl(strings.Split(stdString, "\n")[0])
+	fmt.Printf("%s %s\n%s\n",
+		radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
+	exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start()
 }
