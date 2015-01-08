@@ -65,7 +65,7 @@ func getRadioPageList(page int) (r RadioListData) {
 }
 
 // GetRadioList is getting all channel list.
-func GetRadioList(total int) (result []RadioListDatas) {
+func GetRadioList(total int) (r []RadioListDatas) {
 	queue := make(chan RadioListData)
 	var wg sync.WaitGroup
 	wg.Add(int(LISTPAGE))
@@ -80,7 +80,7 @@ func GetRadioList(total int) (result []RadioListDatas) {
 		defer wg.Done()
 		for v := range queue {
 			for _, data := range v.List {
-				result = append(result, data)
+				r = append(r, data)
 			}
 		}
 	}()
