@@ -9,7 +9,9 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
+	"sync"
 	"text/tabwriter"
 )
 
@@ -61,11 +63,25 @@ func getRadioPageList(page uint8) (r RadioListData) {
 }
 
 func GetRadioList(total uint8) (result []RadioListDatas) {
+	queue := make(chan RadioListData)
+	var wg sync.WaitGroup
+	wg.Add(int(LISTPAGE))
 	for i := uint8(1); i <= total; i++ {
-		for _, v := range getRadioPageList(i).List {
-			result = append(result, v)
-		}
+		go func(i uint8) {
+			defer wg.Done()
+			runtime.Gosched()
+			queue <- getRadioPageList(i)
+		}(i)
 	}
+	go func() {
+		defer wg.Done()
+		for v := range queue {
+			for _, data := range v.List {
+				result = append(result, data)
+			}
+		}
+	}()
+	wg.Wait()
 	return
 }
 
