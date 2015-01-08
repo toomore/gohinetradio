@@ -1,16 +1,13 @@
-package main
+package gohinetradio
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"runtime"
-	"strings"
 	"sync"
 	"text/tabwriter"
 )
@@ -109,18 +106,4 @@ func PrintChannel() {
 	fmt.Println("[308] KISS RADIO 網路音樂台")
 	fmt.Println("[187] NEWS98新聞網")
 	fmt.Println("[370] POP Radio 台北流行廣播電台")
-}
-
-func main() {
-	//PrintChannel()
-	GenList()
-
-	//fmt.Println(GetRadioList(LISTPAGE))
-
-	in := bufio.NewReader(os.Stdin)
-	stdString, _ := in.ReadString('\n')
-	radioData := GetURL(strings.Split(stdString, "\n")[0])
-	fmt.Printf("%s %s\n%s\n",
-		radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
-	exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start()
 }
