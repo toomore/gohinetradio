@@ -1,3 +1,4 @@
+// Package gohinetradio is to get hichannel radio path and with token to play without flash.
 package gohinetradio
 
 import (
@@ -12,12 +13,14 @@ import (
 	"text/tabwriter"
 )
 
+// Base URL.
 const (
 	PLAYURL  string = "http://hichannel.hinet.net/radio/play.do?id=%s"
 	LISTURL  string = "http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=%s"
 	LISTPAGE int    = 4
 )
 
+// RadioData is the json of `http://hichannel.hinet.net/radio/play.do?id=232`
 type RadioData struct {
 	ChannelTitle   string `json:"channel_title"`
 	PlayRadio      string `json:"playRadio"`
@@ -25,8 +28,9 @@ type RadioData struct {
 	ChannelCollect bool   `json:"channel_collect"`
 }
 
-func GetURL(url_no string) (r RadioData) {
-	resp, _ := http.Get(fmt.Sprintf(PLAYURL, url_no))
+// GetURL is getting radio channel url with token.
+func GetURL(No string) (r RadioData) {
+	resp, _ := http.Get(fmt.Sprintf(PLAYURL, No))
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
@@ -34,19 +38,21 @@ func GetURL(url_no string) (r RadioData) {
 	return
 }
 
+// RadioListData is the json of `http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=1`
 type RadioListData struct {
-	PageNo   int
-	PageSize int
-	List     []RadioListDatas
+	PageNo   int              `json:"pageNo"`
+	PageSize int              `json:"pageSize"`
+	List     []RadioListDatas `json:"list"`
 }
 
+//RadioListDatas is RadioListData.List type.
 type RadioListDatas struct {
 	ChannelImage string `json:"channel_image"`
 	ChannelTitle string `json:"channel_title"`
 	RadioType    string `json:"radio_type"`
 	IsChannel    bool   `json:"isChannel"`
 	ProgramName  string `json:"program_name"`
-	ChannelId    string `json:"channel_id"`
+	ChannelID    string `json:"channel_id"`
 }
 
 func getRadioPageList(page int) (r RadioListData) {
@@ -58,6 +64,7 @@ func getRadioPageList(page int) (r RadioListData) {
 	return
 }
 
+// GetRadioList is getting all channel list.
 func GetRadioList(total int) (result []RadioListDatas) {
 	queue := make(chan RadioListData)
 	var wg sync.WaitGroup
@@ -81,12 +88,13 @@ func GetRadioList(total int) (result []RadioListDatas) {
 	return
 }
 
+// GenList is to output table list.
 func GenList() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var output string
 	for no, data := range GetRadioList(LISTPAGE) {
-		output += fmt.Sprintf("%d. [%s] %s\t", no+1, data.ChannelId, data.ChannelTitle)
+		output += fmt.Sprintf("%d. [%s] %s\t", no+1, data.ChannelID, data.ChannelTitle)
 		if (no+1)%3 == 0 {
 			fmt.Fprintln(w, output)
 			output = ""
@@ -96,6 +104,7 @@ func GenList() {
 	w.Flush()
 }
 
+// PrintChannel is my fav channel XD.
 func PrintChannel() {
 	fmt.Println("[207] 中廣新聞網")
 	fmt.Println("[205] 中廣流行網 i like")
