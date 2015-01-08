@@ -14,19 +14,45 @@ import (
 )
 
 const (
-	PlayURL string = "http://hichannel.hinet.net/radio/play.do?id=%s"
+	PLAYURL  string = "http://hichannel.hinet.net/radio/play.do?id=%s"
+	LISTURL  string = "http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=%s"
+	LISTPAGE uint8  = 4
 )
 
 type RadioData struct {
-	ChannelTitle   string
-	PlayRadio      string
-	ProgramName    string
-	ChannelCollect bool
+	ChannelTitle   string `json:"channel_title"`
+	PlayRadio      string `json:"playRadio"`
+	ProgramName    string `json:"programName"`
+	ChannelCollect bool   `json:"channel_collect"`
 }
 
 func GetUrl(url_no string) (r RadioData) {
-	url := fmt.Sprintf(PlayURL, url_no)
+	url := fmt.Sprintf(PLAYURL, url_no)
 	resp, _ := http.Get(url)
+	defer resp.Body.Close()
+	data, _ := ioutil.ReadAll(resp.Body)
+	jsonData := json.NewDecoder(bytes.NewReader(data))
+	jsonData.Decode(&r)
+	return
+}
+
+type RadioListData struct {
+	PageNo   uint8
+	PageSize uint8
+	List     []RadioListDatas
+}
+
+type RadioListDatas struct {
+	ChannelImage string `json:"channel_image"`
+	ChannelTitle string `json:"channel_title"`
+	RadioType    string `json:"radio_type"`
+	IsChannel    bool   `json:"isChannel"`
+	ProgramName  string `json:"program_name"`
+	ChannelId    string `json:"channel_id"`
+}
+
+func getRadioList(page uint8) (r RadioListData) {
+	resp, _ := http.Get(fmt.Sprintf(LISTURL, page))
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
@@ -73,6 +99,8 @@ func main() {
 	//fmt.Println(GetUrl("207"))
 	//PrintChannel()
 	//GetList()
+
+	fmt.Println(getRadioList(4))
 
 	in := bufio.NewReader(os.Stdin)
 	std_string, _ := in.ReadString('\n')
