@@ -18,7 +18,7 @@ import (
 const (
 	PLAYURL  string = "http://hichannel.hinet.net/radio/play.do?id=%s"
 	LISTURL  string = "http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=%s"
-	LISTPAGE uint8  = 4
+	LISTPAGE int    = 4
 )
 
 type RadioData struct {
@@ -39,8 +39,8 @@ func GetUrl(url_no string) (r RadioData) {
 }
 
 type RadioListData struct {
-	PageNo   uint8
-	PageSize uint8
+	PageNo   int
+	PageSize int
 	List     []RadioListDatas
 }
 
@@ -53,7 +53,7 @@ type RadioListDatas struct {
 	ChannelId    string `json:"channel_id"`
 }
 
-func getRadioPageList(page uint8) (r RadioListData) {
+func getRadioPageList(page int) (r RadioListData) {
 	resp, _ := http.Get(fmt.Sprintf(LISTURL, page))
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
@@ -62,12 +62,12 @@ func getRadioPageList(page uint8) (r RadioListData) {
 	return
 }
 
-func GetRadioList(total uint8) (result []RadioListDatas) {
+func GetRadioList(total int) (result []RadioListDatas) {
 	queue := make(chan RadioListData)
 	var wg sync.WaitGroup
 	wg.Add(int(LISTPAGE))
-	for i := uint8(1); i <= total; i++ {
-		go func(i uint8) {
+	for i := 1; i <= total; i++ {
+		go func(i int) {
 			defer wg.Done()
 			runtime.Gosched()
 			queue <- getRadioPageList(i)
