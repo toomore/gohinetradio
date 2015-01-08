@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 	"text/tabwriter"
 )
@@ -69,20 +68,12 @@ func GetRadioList(total uint8) (result []RadioListDatas) {
 	return
 }
 
-func GetList() {
-	resp, _ := http.Get("http://hichannel.hinet.net/radio/mobile/index.do?id=207")
-	defer resp.Body.Close()
-	html := new(bytes.Buffer)
-	html.ReadFrom(resp.Body)
-	reg := regexp.MustCompile(`<div class="stationName">(.+)</div>[\s]+<div class="list"><a href="#" onclick="getInfo\('list','([\d]+)'\);return false;"></a></div>`)
-	url_string := reg.FindAllStringSubmatch(html.String(), -1)
-	url_string = append(url_string, []string{"", "中廣新聞網", "207"})
-	//fmt.Println(url_string)
+func GenList() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var output string
-	for no, data := range url_string {
-		output += fmt.Sprintf("%d. [%s] %s\t", no+1, data[2], data[1])
+	for no, data := range GetRadioList(LISTPAGE) {
+		output += fmt.Sprintf("%d. [%s] %s\t", no+1, data.ChannelId, data.ChannelTitle)
 		if (no+1)%3 == 0 {
 			fmt.Fprintln(w, output)
 			output = ""
@@ -105,11 +96,10 @@ func PrintChannel() {
 }
 
 func main() {
-	//fmt.Println(GetUrl("207"))
 	//PrintChannel()
-	//GetList()
+	GenList()
 
-	fmt.Println(GetRadioList(LISTPAGE))
+	//fmt.Println(GetRadioList(LISTPAGE))
 
 	in := bufio.NewReader(os.Stdin)
 	std_string, _ := in.ReadString('\n')
