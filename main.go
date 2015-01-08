@@ -28,9 +28,8 @@ type RadioData struct {
 	ChannelCollect bool   `json:"channel_collect"`
 }
 
-func GetUrl(url_no string) (r RadioData) {
-	url := fmt.Sprintf(PLAYURL, url_no)
-	resp, _ := http.Get(url)
+func GetURL(url_no string) (r RadioData) {
+	resp, _ := http.Get(fmt.Sprintf(PLAYURL, url_no))
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
@@ -120,7 +119,7 @@ func main() {
 
 	in := bufio.NewReader(os.Stdin)
 	stdString, _ := in.ReadString('\n')
-	radioData := GetUrl(strings.Split(stdString, "\n")[0])
+	radioData := GetURL(strings.Split(stdString, "\n")[0])
 	fmt.Printf("%s %s\n%s\n",
 		radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
 	exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start()
