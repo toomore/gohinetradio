@@ -51,12 +51,21 @@ type RadioListDatas struct {
 	ChannelId    string `json:"channel_id"`
 }
 
-func getRadioList(page uint8) (r RadioListData) {
+func getRadioPageList(page uint8) (r RadioListData) {
 	resp, _ := http.Get(fmt.Sprintf(LISTURL, page))
 	defer resp.Body.Close()
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
 	jsonData.Decode(&r)
+	return
+}
+
+func GetRadioList(total uint8) (result []RadioListDatas) {
+	for i := uint8(1); i <= total; i++ {
+		for _, v := range getRadioPageList(i).List {
+			result = append(result, v)
+		}
+	}
 	return
 }
 
@@ -100,7 +109,7 @@ func main() {
 	//PrintChannel()
 	//GetList()
 
-	fmt.Println(getRadioList(4))
+	fmt.Println(GetRadioList(LISTPAGE))
 
 	in := bufio.NewReader(os.Stdin)
 	std_string, _ := in.ReadString('\n')
