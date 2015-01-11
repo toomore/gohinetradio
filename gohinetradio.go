@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"sort"
+	"strconv"
 	"sync"
 	"text/tabwriter"
 )
@@ -88,15 +90,27 @@ func GetRadioList(total int) (r []RadioListDatas) {
 	return
 }
 
+type ByChannel []RadioListDatas
+
+func (c ByChannel) Len() int      { return len(c) }
+func (c ByChannel) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
+func (c ByChannel) Less(i, j int) bool {
+	a, _ := strconv.Atoi(c[i].ChannelID)
+	b, _ := strconv.Atoi(c[j].ChannelID)
+	return a < b
+}
+
 // GenList is to output table list.
 func GenList() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var output string
 	var no int
-	for _, data := range GetRadioList(LISTPAGE) {
+	radioList := GetRadioList(LISTPAGE)
+	sort.Sort(ByChannel(radioList))
+	for _, data := range radioList {
 		if data.IsChannel {
-			output += fmt.Sprintf("%d. [%s] %s\t", no+1, data.ChannelID, data.ChannelTitle)
+			output += fmt.Sprintf("%d. [%v] %s\t", no+1, data.ChannelID, data.ChannelTitle)
 			if (no+1)%3 == 0 {
 				fmt.Fprintln(w, output)
 				output = ""
