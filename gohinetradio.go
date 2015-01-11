@@ -18,7 +18,7 @@ import (
 // Base URL.
 const (
 	PLAYURL  string = "http://hichannel.hinet.net/radio/play.do?id=%s"
-	LISTURL  string = "http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=%s"
+	LISTURL  string = "http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=%d"
 	LISTPAGE int    = 4
 )
 
