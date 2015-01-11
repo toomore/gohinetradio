@@ -31,13 +31,14 @@ type RadioData struct {
 }
 
 // GetURL is getting radio channel url with token.
-func GetURL(No string) (r RadioData) {
+func GetURL(No string) RadioData {
 	resp, _ := http.Get(fmt.Sprintf(PLAYURL, No))
 	defer resp.Body.Close()
+	var r RadioData
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
 	jsonData.Decode(&r)
-	return
+	return r
 }
 
 // RadioListData is the json of `http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=1`
@@ -57,17 +58,18 @@ type RadioListDatas struct {
 	ChannelID    string `json:"channel_id"`
 }
 
-func getRadioPageList(page int) (r RadioListData) {
+func getRadioPageList(page int) RadioListData {
 	resp, _ := http.Get(fmt.Sprintf(LISTURL, page))
 	defer resp.Body.Close()
+	var r RadioListData
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
 	jsonData.Decode(&r)
-	return
+	return r
 }
 
 // GetRadioList is getting all channel list.
-func GetRadioList(total int) (r []RadioListDatas) {
+func GetRadioList(total int) []RadioListDatas {
 	queue := make(chan RadioListData)
 	var wg sync.WaitGroup
 	wg.Add(LISTPAGE)
@@ -78,6 +80,7 @@ func GetRadioList(total int) (r []RadioListDatas) {
 			queue <- getRadioPageList(i)
 		}(i)
 	}
+	var r []RadioListDatas
 	go func() {
 		defer wg.Done()
 		for v := range queue {
@@ -87,7 +90,7 @@ func GetRadioList(total int) (r []RadioListDatas) {
 		}
 	}()
 	wg.Wait()
-	return
+	return r
 }
 
 type byChannel []RadioListDatas
