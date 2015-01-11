@@ -1,3 +1,4 @@
+// Package main is to play radio with VLC(mac).
 package main
 
 import (
@@ -5,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/toomore/gohinetradio"
@@ -16,10 +18,20 @@ func main() {
 
 	//fmt.Println(GetRadioList(LISTPAGE))
 
+	fmt.Println("輸入廣播頻道編號：")
 	in := bufio.NewReader(os.Stdin)
 	stdString, _ := in.ReadString('\n')
-	radioData := gohinetradio.GetURL(strings.Split(stdString, "\n")[0])
-	fmt.Printf("%s %s\n%s\n",
-		radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
-	exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start()
+	radioNo := strings.Split(stdString, "\n")[0]
+	if len(radioNo) > 0 {
+		radioData, err := gohinetradio.GetURL(radioNo)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Printf("%s %s\n%s\n",
+				radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
+			if runtime.GOOS == "darwin" {
+				exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start()
+			}
+		}
+	}
 }

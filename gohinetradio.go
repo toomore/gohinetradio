@@ -4,6 +4,7 @@ package gohinetradio
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -31,14 +32,18 @@ type RadioData struct {
 }
 
 // GetURL is getting radio channel url with token.
-func GetURL(No string) RadioData {
+func GetURL(No string) (RadioData, error) {
 	resp, _ := http.Get(fmt.Sprintf(PLAYURL, No))
 	defer resp.Body.Close()
 	var r RadioData
+	var err error
 	data, _ := ioutil.ReadAll(resp.Body)
 	jsonData := json.NewDecoder(bytes.NewReader(data))
 	jsonData.Decode(&r)
-	return r
+	if len(r.PlayRadio) == 0 {
+		err = errors.New("No channel data.")
+	}
+	return r, err
 }
 
 // RadioListData is the json of `http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=1`
