@@ -90,11 +90,11 @@ func GetRadioList(total int) (r []RadioListDatas) {
 	return
 }
 
-type ByChannel []RadioListDatas
+type byChannel []RadioListDatas
 
-func (c ByChannel) Len() int      { return len(c) }
-func (c ByChannel) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
-func (c ByChannel) Less(i, j int) bool {
+func (c byChannel) Len() int      { return len(c) }
+func (c byChannel) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
+func (c byChannel) Less(i, j int) bool {
 	a, _ := strconv.Atoi(c[i].ChannelID)
 	b, _ := strconv.Atoi(c[j].ChannelID)
 	return a < b
@@ -107,7 +107,7 @@ func GenList() {
 	var output string
 	var no int
 	radioList := GetRadioList(LISTPAGE)
-	sort.Sort(ByChannel(radioList))
+	sort.Sort(byChannel(radioList))
 	for _, data := range radioList {
 		if data.IsChannel {
 			output += fmt.Sprintf("%d. [%v] %s\t", no+1, data.ChannelID, data.ChannelTitle)
