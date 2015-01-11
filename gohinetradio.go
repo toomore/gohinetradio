@@ -68,7 +68,7 @@ func getRadioPageList(page int) (r RadioListData) {
 func GetRadioList(total int) (r []RadioListDatas) {
 	queue := make(chan RadioListData)
 	var wg sync.WaitGroup
-	wg.Add(int(LISTPAGE))
+	wg.Add(LISTPAGE)
 	for i := 1; i <= total; i++ {
 		go func(i int) {
 			defer wg.Done()
@@ -93,11 +93,15 @@ func GenList() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var output string
-	for no, data := range GetRadioList(LISTPAGE) {
-		output += fmt.Sprintf("%d. [%s] %s\t", no+1, data.ChannelID, data.ChannelTitle)
-		if (no+1)%3 == 0 {
-			fmt.Fprintln(w, output)
-			output = ""
+	var no int
+	for _, data := range GetRadioList(LISTPAGE) {
+		if data.IsChannel {
+			output += fmt.Sprintf("%d. [%s] %s\t", no+1, data.ChannelID, data.ChannelTitle)
+			if (no+1)%3 == 0 {
+				fmt.Fprintln(w, output)
+				output = ""
+			}
+			no++
 		}
 	}
 	fmt.Fprintln(w, output)
