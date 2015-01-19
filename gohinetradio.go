@@ -74,11 +74,12 @@ func getRadioPageList(page int) RadioListData {
 }
 
 // GetRadioList is getting all channel list.
-func GetRadioList(total int) []RadioListDatas {
-	queue := make(chan RadioListData)
+func GetRadioList() []RadioListDatas {
+	queue := make(chan RadioListData, 4)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	var wg sync.WaitGroup
 	wg.Add(LISTPAGE)
-	for i := 1; i <= total; i++ {
+	for i := 1; i <= LISTPAGE; i++ {
 		go func(i int) {
 			defer wg.Done()
 			runtime.Gosched()
@@ -114,7 +115,7 @@ func GenList() {
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var output string
 	var no int
-	radioList := GetRadioList(LISTPAGE)
+	radioList := GetRadioList()
 	sort.Sort(byChannel(radioList))
 	for _, data := range radioList {
 		if data.IsChannel {
