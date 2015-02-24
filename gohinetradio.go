@@ -16,6 +16,12 @@ import (
 	"text/tabwriter"
 )
 
+var nCPU = runtime.NumCPU()
+
+func init() {
+	runtime.GOMAXPROCS(nCPU)
+}
+
 // Base URL.
 const (
 	PLAYURL  string = "http://hichannel.hinet.net/radio/play.do?id=%s"
@@ -73,13 +79,9 @@ func getRadioPageList(page int) RadioListData {
 	return r
 }
 
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-}
-
 // GetRadioList is getting all channel list.
 func GetRadioList() []RadioListDatas {
-	queue := make(chan RadioListData, 4)
+	queue := make(chan RadioListData, nCPU)
 	var wg sync.WaitGroup
 	wg.Add(LISTPAGE)
 	for i := 1; i <= LISTPAGE; i++ {
