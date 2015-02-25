@@ -18,6 +18,7 @@ import (
 
 var nCPU = runtime.NumCPU()
 
+// Init.
 func init() {
 	runtime.GOMAXPROCS(nCPU)
 }
