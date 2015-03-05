@@ -101,6 +101,7 @@ func GetRadioList() []RadioListDatas {
 		}
 	}()
 	wg.Wait()
+	close(queue)
 	return r
 }
 
