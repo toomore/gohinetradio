@@ -83,6 +83,8 @@ func getRadioPageList(page int) RadioListData {
 // GetRadioList is getting all channel list.
 func GetRadioList() []RadioListDatas {
 	queue := make(chan RadioListData, nCPU)
+	defer close(queue)
+
 	var wg sync.WaitGroup
 	wg.Add(LISTPAGE)
 	for i := 1; i <= LISTPAGE; i++ {
@@ -101,7 +103,6 @@ func GetRadioList() []RadioListDatas {
 		}
 	}()
 	wg.Wait()
-	close(queue)
 	return r
 }
 
