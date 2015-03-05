@@ -84,10 +84,9 @@ func getRadioPageList(page int) RadioListData {
 func GetRadioList() []RadioListDatas {
 	queue := make(chan RadioListData, nCPU)
 	var wg sync.WaitGroup
-	wg.Add(LISTPAGE * 2)
+	wg.Add(LISTPAGE)
 	for i := 1; i <= LISTPAGE; i++ {
 		go func(i int) {
-			defer wg.Done()
 			runtime.Gosched()
 			queue <- getRadioPageList(i)
 		}(i)
