@@ -1,4 +1,15 @@
 // Package main is to play radio with VLC(mac).
+//
+/*
+Install:
+
+	go install github.com/toomore/gohinetradio/gohinetradio
+
+Usage:
+
+	gohinetradio
+
+*/
 package main
 
 import (

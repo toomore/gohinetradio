@@ -14,3 +14,7 @@ func TestPrintChannel(*testing.T) {
 func TestGetList(*testing.T) {
 	GenList()
 }
+
+func TestGetRadioList(t *testing.T) {
+	t.Logf("%+v", GetRadioList())
+}
