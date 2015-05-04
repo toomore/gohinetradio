@@ -12,7 +12,6 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
-	"sync"
 	"text/tabwriter"
 )
 
@@ -27,7 +26,7 @@ func init() {
 const (
 	PLAYURL  string = "http://hichannel.hinet.net/radio/play.do?id=%s"
 	LISTURL  string = "http://hichannel.hinet.net/radio/channelList.do?radioType=&freqType=&freq=&area=&pN=%d"
-	LISTPAGE int    = 4
+	LISTPAGE int    = 1
 )
 
 // RadioData is the json of `http://hichannel.hinet.net/radio/play.do?id=232`
@@ -82,28 +81,29 @@ func getRadioPageList(page int) RadioListData {
 
 // GetRadioList is getting all channel list.
 func GetRadioList() []RadioListDatas {
-	queue := make(chan RadioListData, nCPU)
-	defer close(queue)
+	//queue := make(chan RadioListData, nCPU)
+	//defer close(queue)
 
-	var wg sync.WaitGroup
-	wg.Add(LISTPAGE)
-	for i := 1; i <= LISTPAGE; i++ {
-		go func(i int) {
-			runtime.Gosched()
-			queue <- getRadioPageList(i)
-		}(i)
-	}
-	var r []RadioListDatas
-	go func() {
-		for v := range queue {
-			for _, data := range v.List {
-				r = append(r, data)
-			}
-			wg.Done()
-		}
-	}()
-	wg.Wait()
-	return r
+	//var wg sync.WaitGroup
+	//wg.Add(LISTPAGE)
+	//for i := 1; i <= LISTPAGE; i++ {
+	//	go func(i int) {
+	//		runtime.Gosched()
+	//		queue <- getRadioPageList(i)
+	//	}(i)
+	//}
+	//var r []RadioListDatas
+	//go func() {
+	//	for v := range queue {
+	//		for _, data := range v.List {
+	//			r = append(r, data)
+	//		}
+	//		wg.Done()
+	//	}
+	//}()
+	//wg.Wait()
+	//return r
+	return getRadioPageList(LISTPAGE).List
 }
 
 type byChannel []RadioListDatas
