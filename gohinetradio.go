@@ -39,7 +39,10 @@ type RadioData struct {
 
 // GetURL is getting radio channel url with token.
 func GetURL(No string) (RadioData, error) {
-	resp, _ := http.Get(fmt.Sprintf(PLAYURL, No))
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", fmt.Sprintf(PLAYURL, No), nil)
+	req.Header.Add("Referer", "http://hichannel.hinet.net/radio/index.do")
+	resp, _ := client.Do(req)
 	defer resp.Body.Close()
 	var r RadioData
 	var err error
