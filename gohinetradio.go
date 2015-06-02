@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"runtime"
@@ -39,18 +40,27 @@ type RadioData struct {
 
 // GetURL is getting radio channel url with token.
 func GetURL(No string) (RadioData, error) {
+	var (
+		err  error
+		r    RadioData
+		req  *http.Request
+		resp *http.Response
+	)
+
 	client := &http.Client{}
-	req, _ := http.NewRequest("GET", fmt.Sprintf(PLAYURL, No), nil)
+	req, _ = http.NewRequest("GET", fmt.Sprintf(PLAYURL, No), nil)
 	req.Header.Add("Referer", "http://hichannel.hinet.net/radio/index.do")
-	resp, _ := client.Do(req)
+	resp, err = client.Do(req)
+	if err != nil {
+		log.Fatal("No network.")
+	}
 	defer resp.Body.Close()
-	var r RadioData
-	var err error
-	data, _ := ioutil.ReadAll(resp.Body)
-	jsonData := json.NewDecoder(bytes.NewReader(data))
-	jsonData.Decode(&r)
-	if len(r.PlayRadio) == 0 {
-		err = errors.New("No channel data.")
+
+	if data, err := ioutil.ReadAll(resp.Body); err == nil {
+		json.NewDecoder(bytes.NewReader(data)).Decode(&r)
+		if len(r.PlayRadio) == 0 {
+			err = errors.New("No channel data.")
+		}
 	}
 	return r, err
 }
@@ -73,12 +83,20 @@ type RadioListDatas struct {
 }
 
 func getRadioPageList(page int) RadioListData {
-	resp, _ := http.Get(fmt.Sprintf(LISTURL, page))
-	defer resp.Body.Close()
-	var r RadioListData
-	data, _ := ioutil.ReadAll(resp.Body)
-	jsonData := json.NewDecoder(bytes.NewReader(data))
-	jsonData.Decode(&r)
+	var (
+		err  error
+		r    RadioListData
+		resp *http.Response
+	)
+	if resp, err = http.Get(fmt.Sprintf(LISTURL, page)); err == nil {
+		defer resp.Body.Close()
+	} else {
+		log.Fatal("No network.")
+	}
+
+	if data, err := ioutil.ReadAll(resp.Body); err == nil {
+		json.NewDecoder(bytes.NewReader(data)).Decode(&r)
+	}
 	return r
 }
 
@@ -123,9 +141,12 @@ func (c byChannel) Less(i, j int) bool {
 func GenList() {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	var output string
-	var no int
-	radioList := GetRadioList()
+	var (
+		no        int
+		output    string
+		radioList []RadioListDatas
+	)
+	radioList = GetRadioList()
 	sort.Sort(byChannel(radioList))
 	for _, data := range radioList {
 		if data.IsChannel {
