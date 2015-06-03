@@ -13,7 +13,8 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
-	"text/tabwriter"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 var nCPU = runtime.NumCPU()
@@ -139,27 +140,42 @@ func (c byChannel) Less(i, j int) bool {
 
 // GenList is to output table list.
 func GenList() {
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	//w := new(tabwriter.Writer)
+	//w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 	var (
-		no        int
-		output    string
+		no int
+		//output    string
 		radioList []RadioListDatas
 	)
 	radioList = GetRadioList()
 	sort.Sort(byChannel(radioList))
+
+	var tabledata [][]string
+	var rows []string
+	//table = make([][]string, 0)
+	rows = make([]string, 3)
 	for _, data := range radioList {
 		if data.IsChannel {
-			output += fmt.Sprintf("%d. [%v] %s\t", no+1, data.ChannelID, data.ChannelTitle)
-			if (no+1)%3 == 0 {
-				fmt.Fprintln(w, output)
-				output = ""
-			}
 			no++
+			//rows[(no-1)%3] = fmt.Sprintf("%d. [%v] %s", no, data.ChannelID, data.ChannelTitle)
+			rows[(no-1)%3] = fmt.Sprintf("[%v][%s]", data.ChannelID, data.ChannelTitle)
+			if (no)%3 == 0 {
+				tabledata = append(tabledata, rows)
+				rows = make([]string, 3)
+				//fmt.Fprintln(w, output)
+				//output = ""
+			}
 		}
 	}
-	fmt.Fprintln(w, output)
-	w.Flush()
+	if no%3 != 0 {
+		tabledata = append(tabledata, rows)
+	}
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetColWidth(500)
+	table.AppendBulk(tabledata)
+	table.Render()
+	//fmt.Fprintln(w, output)
+	//w.Flush()
 }
 
 // PrintChannel is my fav channel XD.
