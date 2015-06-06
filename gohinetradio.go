@@ -140,7 +140,7 @@ func (c byChannel) Less(i, j int) bool {
 // GenList is to output table list.
 func GenList() {
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(os.Stdout, 38, 0, 0, ' ', 0)
 	var (
 		no        int
 		output    string
@@ -150,7 +150,7 @@ func GenList() {
 	sort.Sort(byChannel(radioList))
 	for _, data := range radioList {
 		if data.IsChannel {
-			output += fmt.Sprintf("%d. [%v] %s\t", no+1, data.ChannelID, data.ChannelTitle)
+			output += fmt.Sprintf("%3d. [%v] %s\t", no+1, data.ChannelID, data.ChannelTitle)
 			if (no+1)%3 == 0 {
 				fmt.Fprintln(w, output)
 				output = ""
