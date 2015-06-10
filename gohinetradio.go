@@ -16,11 +16,9 @@ import (
 	"text/tabwriter"
 )
 
-var nCPU = runtime.NumCPU()
-
 // Init.
 func init() {
-	runtime.GOMAXPROCS(nCPU)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
 // Base URL.
@@ -82,22 +80,21 @@ type RadioListDatas struct {
 	ChannelID    string `json:"channel_id"`
 }
 
-func getRadioPageList(page int) RadioListData {
+func getRadioPageList(page int) (RadioListData, error) {
 	var (
+		data []byte
 		err  error
 		r    RadioListData
 		resp *http.Response
 	)
 	if resp, err = http.Get(fmt.Sprintf(LISTURL, page)); err == nil {
 		defer resp.Body.Close()
-	} else {
-		log.Fatal("No network.")
 	}
 
-	if data, err := ioutil.ReadAll(resp.Body); err == nil {
+	if data, err = ioutil.ReadAll(resp.Body); err == nil {
 		json.NewDecoder(bytes.NewReader(data)).Decode(&r)
 	}
-	return r
+	return r, err
 }
 
 // GetRadioList is getting all channel list.
@@ -124,7 +121,13 @@ func GetRadioList() []RadioListDatas {
 	//}()
 	//wg.Wait()
 	//return r
-	return getRadioPageList(LISTPAGE).List
+	var result []RadioListDatas
+
+	if list, err := getRadioPageList(LISTPAGE); err == nil {
+		result = list.List
+	}
+
+	return result
 }
 
 type byChannel []RadioListDatas
@@ -139,13 +142,13 @@ func (c byChannel) Less(i, j int) bool {
 
 // GenList is to output table list.
 func GenList() {
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 38, 0, 0, ' ', 0)
 	var (
 		no        int
 		output    string
 		radioList []RadioListDatas
 	)
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 38, 0, 0, ' ', 0)
 	radioList = GetRadioList()
 	sort.Sort(byChannel(radioList))
 	for _, data := range radioList {
