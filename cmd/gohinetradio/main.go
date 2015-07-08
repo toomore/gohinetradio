@@ -29,12 +29,16 @@ func play(radioNo string) {
 	if radioData, err := gohinetradio.GetURL(radioNo); err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("%s %s\n%s\n",
-			radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
-		if runtime.GOOS == "darwin" {
-			if err := exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start(); err != nil {
-				log.Fatal(err)
+		if radioData.PlayRadio != "" {
+			fmt.Printf("%s %s\n%s\n",
+				radioData.ChannelTitle, radioData.ProgramName, radioData.PlayRadio)
+			if runtime.GOOS == "darwin" {
+				if err := exec.Command("/Applications/VLC.app/Contents/MacOS/VLC", radioData.PlayRadio).Start(); err != nil {
+					log.Fatal(err)
+				}
 			}
+		} else {
+			fmt.Println("無廣播頻道！")
 		}
 	}
 }
